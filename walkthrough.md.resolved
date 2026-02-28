@@ -1,0 +1,67 @@
+# University Placement Support System — Walkthrough
+
+## Phase 1 — Initial Build ✅
+Full Flask placement portal with 20+ files, JWT auth, dark-themed UI.
+
+## Phase 2 — Dataset & Logins ✅
+Imported 200 students, 3-tab login, company registration with verified IDs.
+
+## Phase 3 — ML Predictions (Random Forest) ✅
+
+### What Was Built
+
+| Feature | Details |
+|---|---|
+| **Placement Classifier** | Random Forest (100 trees) → Placed / Not Placed with confidence % |
+| **Salary Regressor** | Random Forest → predicted package in LPA with range |
+| **Recommendation Engine** | TF-IDF + Cosine Similarity matching for Company job skills |
+| **Feature Importance** | Animated horizontal bars from `model.feature_importances_` |
+| **Model Metrics** | Classifier accuracy + Regressor R² displayed live |
+| **Auto-train** | Models train automatically on first server startup |
+
+### Feature Importances Discovered
+
+| Feature | Importance |
+|---|---|
+| CGPA | **50.2%** |
+| Certification Count | 21.7% |
+| Internship Count | 14.7% |
+| Skill Count | 7.0% |
+| Project Count | 6.4% |
+
+### Files Created
+
+- [services/ml_service.py](file:///d:/Downloads/Placement_Registration1/services/ml_service.py) — Random Forest training, prediction, feature importance
+- [routes/ml.py](file:///d:/Downloads/Placement_Registration1/routes/ml.py) — 6 API endpoints (`/train`, `/predict/placement`, `/predict/salary`, `/predict/my-profile`, `/feature-importance`, `/metrics`)
+
+### Verification Screenshots
+
+````carousel
+![Admin ML panel — prediction form with results (Not Placed, 10.12 LPA, 93.95% confidence) + model performance (72.5% / 77.66%)](C:/Users/HP/.gemini/antigravity/brain/5712861a-c488-4977-8e8c-710203fdaed8/admin_prediction_results_1772199459878.png)
+<!-- slide -->
+![Admin panel — Feature Importance bars (CGPA 50.2%, Certs 21.7%, Internships 14.7%)](C:/Users/HP/.gemini/antigravity/brain/5712861a-c488-4977-8e8c-710203fdaed8/admin_ml_panel_full_1772199431243.png)
+<!---- slide ---->
+![Student S001 — My Prediction page with auto-profile features, placement prediction (Not Placed, 66.85%), salary 10.01 LPA](C:/Users/HP/.gemini/antigravity/brain/5712861a-c488-4977-8e8c-710203fdaed8/student_prediction_results_1772199509641.png)
+<!---- slide ---->
+![Company Dashboard - AI Skill Matchmaker recommending verified students using TF-IDF for 'Python Machine Learning'](C:/Users/HP/.gemini/antigravity/brain/5712861a-c488-4977-8e8c-710203fdaed8/ai_skill_matches_python_ml_1772201438486.png)
+````
+
+### Test Recording
+
+![Full ML prediction test — admin + student flows](C:/Users/HP/.gemini/antigravity/brain/5712861a-c488-4977-8e8c-710203fdaed8/ml_prediction_test_1772198895439.webp)
+
+---
+
+## How to Run
+
+```bash
+python -m pip install -r requirements.txt
+python -m pip install pandas openpyxl scikit-learn
+python seed.py          # Seeds admin + 200 students
+python app.py           # Auto-trains ML models on first run
+```
+
+### Login Credentials
+- **Admin**: `rishitha` / `rishitha123`
+- **Students**: Student ID as both username & password (S001–S200)
+- **Company**: Register with verified Company ID (CMP001–CMP020)

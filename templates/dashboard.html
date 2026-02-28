@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="University Placement Support System — Dashboard">
+    <title>JNTU-GV Placement cell — Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- ─── Sidebar ─── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>🎓 JNTU-GV Placement cell</h2>
+                <div><span id="username-display"></span></div>
+                <span id="role-badge" class="role-badge"></span>
+            </div>
+            <nav class="sidebar-nav">
+                <!-- Admin -->
+                <div class="nav-item" data-role="admin" data-panel="panel-dashboard"><span class="icon">📊</span>
+                    Dashboard</div>
+                <div class="nav-item" data-role="admin" data-panel="panel-metrics"><span class="icon">📈</span>
+                    Evaluation Metrics</div>
+                <!-- Admin Navbar Metrics Display -->
+                <div class="nav-metrics" data-role="admin"
+                    style="display: none; background: rgba(255,255,255,0.05); margin: 8px 16px; padding: 12px; border-radius: 8px; border-left: 3px solid var(--accent);">
+                    <div
+                        style="font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; font-weight: 600;">
+                        Model Metrics</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <span>Accuracy</span><span id="nav-metric-acc"
+                            style="font-weight: 600; color: #00d97e;">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <span>Precision</span><span id="nav-metric-pre" style="font-weight: 600;">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                        <span>Recall</span><span id="nav-metric-rec" style="font-weight: 600;">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                        <span>F1 Score</span><span id="nav-metric-f1" style="font-weight: 600; color: #ffcc00;">-</span>
+                    </div>
+                </div>
+                <div class="nav-item" data-role="admin" data-panel="panel-users"><span class="icon">👥</span> Users
+                </div>
+                <div class="nav-item" data-role="admin" data-panel="panel-students"><span class="icon">🎓</span>
+                    Students</div>
+                <div class="nav-item" data-role="admin" data-panel="panel-placements"><span class="icon">💼</span>
+                    Opportunities</div>
+
+                <!-- Student -->
+                <div class="nav-item" data-role="student" data-panel="panel-profile"><span class="icon">👤</span> My
+                    Profile</div>
+                <div class="nav-item" data-role="student" data-panel="panel-my-placements"><span class="icon">💼</span>
+                    Opportunities</div>
+                <div class="nav-item" data-role="student" data-panel="panel-my-prediction"><span class="icon">🤖</span>
+                    My
+                    Prediction</div>
+                <div class="nav-item" data-role="student" data-panel="panel-my-evaluation"><span class="icon">📈</span>
+                    Evaluation Graphs</div>
+                <!-- Company -->
+                <div class="nav-item" data-role="company" data-panel="panel-browse"><span class="icon">🔍</span> Browse
+                    Students</div>
+                <div class="nav-item" data-role="company" data-panel="panel-company-placements"><span
+                        class="icon">💼</span> My Posts</div>
+                <div class="nav-item" data-role="company" data-panel="panel-company-reports"><span
+                        class="icon">📊</span> Reports</div>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">🚪 Sign Out</button>
+            </div>
+        </aside>
+
+        <!-- ─── Main ─── -->
+        <main class="main">
+
+            <!-- ═══ ADMIN: Dashboard ═══ -->
+            <div class="panel" id="panel-dashboard">
+                <div class="page-header">
+                    <h1>Admin Dashboard</h1>
+                    <p>Overview of placement statistics</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-users">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-students">0</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-verified">0</div>
+                        <div class="stat-label">Verified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-placed">0</div>
+                        <div class="stat-label">Placed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-opportunities">0</div>
+                        <div class="stat-label">Opportunities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-avg-score">0</div>
+                        <div class="stat-label">Avg Score</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="downloadReport('csv')">📥 Download CSV</button>
+                    <button class="btn btn-primary" onclick="downloadReport('pdf')">📄 Download PDF</button>
+                    <button class="btn btn-outline" onclick="recalculateScores()">🔄 Recalculate Scores</button>
+                </div>
+            </div>
+
+            <!-- ═══ ADMIN: Metrics ═══ -->
+            <div class="panel" id="panel-metrics">
+                <div class="page-header">
+                    <h1>📈 ML Evaluation Metrics</h1>
+                    <p>Live performance statistics of the Random Forest placement prediction models</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-top: 4px solid #00d97e;">
+                        <div class="stat-value" id="metric-accuracy" style="color: #00d97e;">0%</div>
+                        <div class="stat-label">Overall Accuracy</div>
+                    </div>
+                    <div class="stat-card" style="border-top: 4px solid var(--accent);">
+                        <div class="stat-value" id="metric-precision" style="color: var(--accent);">0.0</div>
+                        <div class="stat-label">Precision (Placed)</div>
+                    </div>
+                    <div class="stat-card" style="border-top: 4px solid var(--accent);">
+                        <div class="stat-value" id="metric-recall" style="color: var(--accent);">0.0</div>
+                        <div class="stat-label">Recall (Placed)</div>
+                    </div>
+                    <div class="stat-card" style="border-top: 4px solid #ffcc00;">
+                        <div class="stat-value" id="metric-f1" style="color: #ffcc00;">0.0</div>
+                        <div class="stat-label">F1-Score (Placed)</div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 24px;">
+                    <h3 style="margin-bottom: 12px;">Model Diagnostics</h3>
+                    <p style="color: var(--text-secondary); line-height: 1.6;">
+                        These metrics evaluate the internally managed <strong>RandomForestClassifier</strong> which
+                        determines student placement probability based on CGPA, Skills, Internships, Certifications, and
+                        Projects. <br><br>
+                        <strong>Precision:</strong> Out of all students predicted as 'Placed', how many were actually
+                        placed? <br>
+                        <strong>Recall:</strong> Out of all actual 'Placed' students, how many did the model correctly
+                        find? <br>
+                        <strong>F1-Score:</strong> The harmonic mean of Precision and Recall.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ═══ ADMIN: Users ═══ -->
+            <div class="panel" id="panel-users">
+                <div class="page-header">
+                    <h1>User Management</h1>
+                    <p>Create and manage user accounts</p>
+                </div>
+                <button class="btn btn-primary" onclick="openCreateUserModal()" style="margin-bottom:16px;">+ Create
+                    User</button>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ ADMIN: Students ═══ -->
+            <div class="panel" id="panel-students">
+                <div class="page-header">
+                    <h1>Student Profiles</h1>
+                    <p>View, filter, and verify student profiles</p>
+                </div>
+                <div class="filter-bar">
+                    <input id="filter-dept" placeholder="Department" onchange="loadStudents()">
+                    <input id="filter-cgpa" type="number" step="0.1" placeholder="Min CGPA" onchange="loadStudents()">
+                    <input id="filter-skills" placeholder="Skills (comma-sep)" onchange="loadStudents()">
+                    <button class="btn btn-outline" onclick="loadStudents()">🔍 Filter</button>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Roll</th>
+                                    <th>Name</th>
+                                    <th>Dept</th>
+                                    <th>CGPA</th>
+                                    <th>Score</th>
+                                    <th>Verified</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ ADMIN: Placements ═══ -->
+            <div class="panel" id="panel-placements">
+                <div class="page-header">
+                    <h1>Placement Opportunities</h1>
+                    <p>Manage company opportunities</p>
+                </div>
+                <button class="btn btn-primary" onclick="openCreatePlacementModal()" style="margin-bottom:16px;">+
+                    Create Opportunity</button>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Role</th>
+                                    <th>Package</th>
+                                    <th>Min CGPA</th>
+                                    <th>Deadline</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="placements-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ STUDENT: Profile ═══ -->
+            <div class="panel" id="panel-profile">
+                <div class="page-header">
+                    <h1>My Profile</h1>
+                    <p>Manage your placement profile</p>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 280px;gap:24px;">
+                    <div class="card">
+                        <form onsubmit="saveMyProfile(event)">
+                            <div class="form-row">
+                                <div class="form-group"><label>Full Name</label><input id="sp-fullname" required></div>
+                                <div class="form-group"><label>Department</label><input id="sp-dept"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Roll Number</label><input id="sp-roll"></div>
+                                <div class="form-group"><label>CGPA (0-10)</label><input id="sp-cgpa" type="number"
+                                        step="0.01" min="0" max="10"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>10th %</label><input id="sp-10th" type="number"
+                                        step="0.1"></div>
+                                <div class="form-group"><label>12th %</label><input id="sp-12th" type="number"
+                                        step="0.1"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Technical Skills</label>
+                                    <select id="sp-prog-rating">
+                                        <option value="">-- Select --</option>
+                                        <option value="Python & Data Analysis">Python & Data Analysis</option>
+                                        <option value="Full Stack Development">Full Stack Development</option>
+                                        <option value="Cloud Computing">Cloud Computing</option>
+                                        <option value="Cybersecurity">Cybersecurity</option>
+                                        <option value="AI & Machine Learning">AI & Machine Learning</option>
+                                        <option value="Mobile App Development">Mobile App Development</option>
+                                        <option value="DevOps Engineering">DevOps Engineering</option>
+                                        <option value="Database Management">Database Management</option>
+                                        <option value="Business Intelligence">Business Intelligence</option>
+                                        <option value="Embedded Systems">Embedded Systems</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Soft Skills</label>
+                                    <select id="sp-soft-rating">
+                                        <option value="">-- Select --</option>
+                                        <option value="Leadership & Teamwork">Leadership & Teamwork</option>
+                                        <option value="Critical Thinking">Critical Thinking</option>
+                                        <option value="Effective Communication">Effective Communication</option>
+                                        <option value="Adaptability">Adaptability</option>
+                                        <option value="Problem Solving">Problem Solving</option>
+                                        <option value="Time Management">Time Management</option>
+                                        <option value="Creativity">Creativity</option>
+                                        <option value="Decision Making">Decision Making</option>
+                                        <option value="Emotional Intelligence">Emotional Intelligence</option>
+                                        <option value="Collaboration">Collaboration</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group"><label>Certifications (comma-separated)</label><input id="sp-certs">
+                            </div>
+                            <div class="form-group"><label>Projects (comma-separated)</label><input id="sp-projects">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group"><label>Internships (comma-separated)</label><input
+                                        id="sp-internships">
+                                </div>
+                                <div class="form-group"><label>Internship Count</label><input id="sp-intern-count"
+                                        type="number" min="0"></div>
+                            </div>
+                            <div class="form-group"><label>Career Preferences</label><textarea
+                                    id="sp-career"></textarea></div>
+                            <button type="submit" class="btn btn-primary" style="margin-top:12px;">💾 Save
+                                Profile</button>
+                        </form>
+                    </div>
+                    <div>
+                        <div class="card" style="text-align:center;">
+                            <h3 style="margin-bottom:12px;">Employability Score</h3>
+                            <div class="score-ring">
+                                <svg width="100" height="100" id="score-ring-svg">
+                                    <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)"
+                                        stroke-width="8" />
+                                    <circle class="ring-fill" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)"
+                                        stroke-width="8" stroke-linecap="round" stroke-dasharray="264"
+                                        stroke-dashoffset="264" />
+                                </svg>
+                                <div class="value" id="my-score-value">0</div>
+                            </div>
+                            <div id="my-verified" style="margin:8px 0;"></div>
+                            <div id="my-placement-status"></div>
+                        </div>
+                        <div class="card">
+                            <h3 style="margin-bottom:12px;">Uploads</h3>
+                            <div class="form-group"><label>Resume</label><input type="file" id="upload-resume"
+                                    accept=".pdf,.doc,.docx"><button class="btn btn-sm btn-outline"
+                                    onclick="uploadFile('resume')" style="margin-top:6px;">Upload</button></div>
+                            <div class="form-group"><label>Photo</label><input type="file" id="upload-photo"
+                                    accept=".jpg,.jpeg,.png"><button class="btn btn-sm btn-outline"
+                                    onclick="uploadFile('photo')" style="margin-top:6px;">Upload</button></div>
+                            <div class="form-group"><label>Document</label><input type="file"
+                                    id="upload-document"><button class="btn btn-sm btn-outline"
+                                    onclick="uploadFile('document')" style="margin-top:6px;">Upload</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ STUDENT: Opportunities ═══ -->
+            <div class="panel" id="panel-my-placements">
+                <div class="page-header">
+                    <h1>Placement Opportunities</h1>
+                    <p>Browse and apply to open positions</p>
+                </div>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Role</th>
+                                    <th>Package</th>
+                                    <th>Min CGPA</th>
+                                    <th>Deadline</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-placements-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- ═══ STUDENT: ML Prediction ═══ -->
+            <div class="panel" id="panel-my-prediction">
+                <div class="page-header">
+                    <h1>🤖 My Placement Prediction</h1>
+                    <p>AI-powered prediction based on your profile data</p>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                    <div class="card">
+                        <h3 style="margin-bottom:16px;">Your Profile Features</h3>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td style="color:var(--text-secondary);">CGPA</td>
+                                    <td id="myml-cgpa">—</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:var(--text-secondary);">Technical Skills</td>
+                                    <td id="myml-prog">—</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:var(--text-secondary);">Soft Skills</td>
+                                    <td id="myml-soft">—</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:var(--text-secondary);">Internships</td>
+                                    <td id="myml-intern">—</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:var(--text-secondary);">Certifications</td>
+                                    <td id="myml-certs">—</td>
+                                </tr>
+                                <tr>
+                                    <td style="color:var(--text-secondary);">Projects</td>
+                                    <td id="myml-projects">—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <div class="card" style="text-align:center;">
+                            <h3 style="margin-bottom:12px;">Placement Prediction</h3>
+                            <div id="myml-status" style="font-size:28px;font-weight:700;margin:16px 0;">—</div>
+                            <div style="margin-bottom:12px;"><span
+                                    style="color:var(--text-secondary);">Confidence:</span> <span id="myml-confidence"
+                                    style="font-weight:600;">—</span></div>
+                            <div
+                                style="background:rgba(255,255,255,0.06);border-radius:8px;height:12px;overflow:hidden;margin:0 20px;">
+                                <div id="myml-conf-bar"
+                                    style="height:100%;background:linear-gradient(90deg,#00d97e,#10b981);border-radius:8px;width:0%;transition:width 0.8s ease;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card" style="text-align:center;margin-top:16px;">
+                            <h3 style="margin-bottom:12px;">Predicted Package</h3>
+                            <div id="myml-salary"
+                                style="font-size:32px;font-weight:700;color:var(--accent);margin:16px 0;">—
+                            </div>
+                            <div id="myml-salary-range" style="color:var(--text-secondary);font-size:13px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Feature Importance for student -->
+                <div class="card" style="margin-top:24px;">
+                    <h3 style="margin-bottom:16px;">What Matters Most for Placement</h3>
+                    <div id="student-feature-bars"></div>
+                </div>
+            </div>
+
+            <!-- ═══ STUDENT: Evaluation Graphs ═══ -->
+            <div class="panel" id="panel-my-evaluation">
+                <div class="page-header">
+                    <h1>📈 Evaluation Graphs</h1>
+                    <p>Visual comparisons of your performance against department averages.</p>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr;gap:24px;">
+                    <div class="card" style="text-align:center;">
+                        <h3 style="margin-bottom:16px;">CGPA Comparison</h3>
+                        <div id="eval-cgpa-container">
+                            <img id="eval-cgpa-img" style="max-width:100%; height:auto; display:none; margin:0 auto;" />
+                        </div>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <h3 style="margin-bottom:16px;">Employability Score Comparison</h3>
+                        <div id="eval-emp-container">
+                            <img id="eval-emp-img" style="max-width:100%; height:auto; display:none; margin:0 auto;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ COMPANY: Browse ═══ -->
+            <div class="panel" id="panel-browse">
+                <div class="page-header">
+                    <h1>Browse Students</h1>
+                    <p>Explore verified student profiles</p>
+                </div>
+                <div class="filter-bar">
+                    <input id="c-filter-dept" placeholder="Department" onchange="loadBrowseStudents()">
+                    <input id="c-filter-cgpa" type="number" step="0.1" placeholder="Min CGPA"
+                        onchange="loadBrowseStudents()">
+                    <input id="c-filter-skills" placeholder="Skills" onchange="loadBrowseStudents()">
+                    <button class="btn btn-outline" onclick="loadBrowseStudents()">🔍 Filter</button>
+                </div>
+
+                <!-- AI Matchmaker Section -->
+                <div class="card"
+                    style="margin-bottom: 24px; border: 1px solid var(--accent); background: rgba(108, 99, 255, 0.05);">
+                    <h3 style="margin-bottom:12px;">🌟 AI Role Matchmaker</h3>
+                    <p style="color:var(--text-secondary); margin-bottom:16px;">Describe the required job role or
+                        specific skills. Our AI will instantly find the best student matches using TF-IDF & Cosine
+                        Similarity.</p>
+                    <div style="display:flex; gap:12px;">
+                        <input id="c-ai-skills"
+                            placeholder="e.g. Frontend Developer, Python, Machine Learning, React, AWS" style="flex:1;">
+                        <button class="btn btn-primary" onclick="findAIMatches()">🤖 Find Best Fits</button>
+                    </div>
+                    <div id="ai-matches-container" style="margin-top:20px; display:none;">
+                        <h4 style="margin-bottom:12px;">Top Matches</h4>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Match %</th>
+                                        <th>Skills</th>
+                                        <th>CGPA</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ai-matches-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Dept</th>
+                                    <th>CGPA</th>
+                                    <th>Skills</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="browse-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ COMPANY: Placements ═══ -->
+            <div class="panel" id="panel-company-placements">
+                <div class="page-header">
+                    <h1>My Posts</h1>
+                    <p>Manage your placement opportunities</p>
+                </div>
+                <button class="btn btn-primary" onclick="openCreatePlacementModal()" style="margin-bottom:16px;">+
+                    New Post</button>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Package</th>
+                                    <th>Min CGPA</th>
+                                    <th>Deadline</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="company-placements-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ COMPANY: Reports ═══ -->
+            <div class="panel" id="panel-company-reports">
+                <div class="page-header">
+                    <h1>Reports</h1>
+                    <p>Consolidated student data overview</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="cr-total">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cr-avg-cgpa">0</div>
+                        <div class="stat-label">Avg CGPA</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cr-avg-score">0</div>
+                        <div class="stat-label">Avg Score</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:12px;">Department Breakdown</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Department</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cr-depts"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ═══ MODALS ═══ -->
+
+    <!-- User Modal -->
+    <div class="modal-overlay" id="modal-user">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-user-title">Create User</h3><button class="modal-close"
+                    onclick="closeModal('modal-user')">✕</button>
+            </div>
+            <form id="user-form" onsubmit="saveUser(event)">
+                <input type="hidden" id="user-id-field">
+                <div class="form-group"><label>Username</label><input id="user-username" required></div>
+                <div class="form-group"><label>Email</label><input id="user-email" type="email" required></div>
+                <div class="form-group"><label>Password</label><input id="user-password" type="password"></div>
+                <div class="form-group"><label>Role</label><select id="user-role">
+                        <option value="student">Student</option>
+                        <option value="company">Company</option>
+                    </select></div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Placement Modal -->
+    <div class="modal-overlay" id="modal-placement">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-placement-title">Create Opportunity</h3><button class="modal-close"
+                    onclick="closeModal('modal-placement')">✕</button>
+            </div>
+            <form id="placement-form" onsubmit="savePlacement(event)">
+                <input type="hidden" id="placement-id-field">
+                <div class="form-row">
+                    <div class="form-group"><label>Company Name</label><input id="pl-company" required></div>
+                    <div class="form-group"><label>Role Title</label><input id="pl-role" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Package</label><input id="pl-package" placeholder="e.g. 6 LPA"></div>
+                    <div class="form-group"><label>Min CGPA</label><input id="pl-cgpa" type="number" step="0.1" min="0"
+                            max="10"></div>
+                </div>
+                <div class="form-group"><label>Eligibility</label><textarea id="pl-eligibility"></textarea></div>
+                <div class="form-group"><label>Required Skills (comma-sep)</label><input id="pl-skills"></div>
+                <div class="form-group"><label>Deadline</label><input id="pl-deadline" type="date"></div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Detail Modal -->
+    <div class="modal-overlay" id="modal-student-detail">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Student Details</h3><button class="modal-close"
+                    onclick="closeModal('modal-student-detail')">✕</button>
+            </div>
+            <div id="student-detail-content"></div>
+        </div>
+    </div>
+
+    <!-- Application Flow Modal (Student) -->
+    <div class="modal-overlay" id="modal-app-flow">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Application Status Flow</h3>
+                <button class="modal-close" onclick="closeModal('modal-app-flow')">✕</button>
+            </div>
+            <div id="app-flow-content"></div>
+        </div>
+    </div>
+
+    <!-- Update Application Status Modal (Company) -->
+    <div class="modal-overlay" id="modal-update-status">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Update Status</h3>
+                <button class="modal-close" onclick="closeModal('modal-update-status')">✕</button>
+            </div>
+            <form id="update-status-form" onsubmit="submitUpdateStatus(event)">
+                <input type="hidden" id="us-record-id">
+                <div class="form-group">
+                    <label>Application Status</label>
+                    <select id="us-status-select" required>
+                        <option value="applied">Applied</option>
+                        <option value="shortlisted">Shortlisted</option>
+                        <option value="selected">Selected</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">
+                    Note: Flow moves from Applied → Shortlisted → Selected/Rejected.
+                </p>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Update Status</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+
+</html>

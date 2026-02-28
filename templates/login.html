@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="University Placement Support System — Login">
+    <title>JNTU-GV Placement cell — Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --bg-dark: #0a0a1a;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --accent: #6c63ff;
+            --accent-hover: #7b73ff;
+            --accent-glow: rgba(108, 99, 255, 0.35);
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --error: #ff4d6a;
+            --success: #00d97e;
+            --input-bg: rgba(255, 255, 255, 0.06);
+            --green: #00d97e;
+            --orange: #ffaa33;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: var(--text-primary)
+        }
+
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: .5;
+            animation: float 18s ease-in-out infinite;
+            z-index: 0
+        }
+
+        .bg-blob:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: #6c63ff22;
+            top: -10%;
+            left: -5%
+        }
+
+        .bg-blob:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #00d97e18;
+            bottom: -10%;
+            right: -5%;
+            animation-delay: -6s
+        }
+
+        .bg-blob:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: #ff4d6a12;
+            top: 40%;
+            left: 50%;
+            animation-delay: -12s
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            33% {
+                transform: translate(30px, -20px) scale(1.05)
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(.95)
+            }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+            padding: 20px
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px 36px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+            animation: slideUp .6s ease-out
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 28px
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 20px var(--accent-glow)
+        }
+
+        .logo-section h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -.5px
+        }
+
+        .logo-section p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px
+        }
+
+        /* ─── Tabs ─── */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, .03);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 28px
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all .2s;
+            border: none;
+            background: none;
+            font-family: inherit
+        }
+
+        .tab:hover {
+            color: var(--text-primary)
+        }
+
+        .tab.active {
+            background: rgba(108, 99, 255, .2);
+            color: var(--accent);
+            box-shadow: 0 2px 8px rgba(108, 99, 255, .15)
+        }
+
+        .tab-icon {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 2px
+        }
+
+        .form-group {
+            margin-bottom: 18px
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .8px
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 15px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: border-color .2s, box-shadow .2s;
+            outline: none
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow)
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, .2)
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .2s;
+            margin-top: 6px
+        }
+
+        .btn-login:hover {
+            transform: translateY(-1px)
+        }
+
+        .btn-login:active {
+            transform: translateY(0)
+        }
+
+        .btn-login:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, var(--accent), #8b5cf6)
+        }
+
+        .btn-admin:hover {
+            box-shadow: 0 6px 24px var(--accent-glow)
+        }
+
+        .btn-student {
+            background: linear-gradient(135deg, #00d97e, #10b981)
+        }
+
+        .btn-student:hover {
+            box-shadow: 0 6px 24px rgba(0, 217, 126, .3)
+        }
+
+        .btn-company {
+            background: linear-gradient(135deg, #ffaa33, #f59e0b)
+        }
+
+        .btn-company:hover {
+            box-shadow: 0 6px 24px rgba(255, 170, 51, .3)
+        }
+
+        .error-msg {
+            background: rgba(255, 77, 106, .1);
+            border: 1px solid rgba(255, 77, 106, .2);
+            color: var(--error);
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            animation: shake .4s ease-in-out
+        }
+
+        .success-msg {
+            background: rgba(0, 217, 126, .1);
+            border: 1px solid rgba(0, 217, 126, .2);
+            color: var(--success);
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+
+            25% {
+                transform: translateX(-6px)
+            }
+
+            75% {
+                transform: translateX(6px)
+            }
+        }
+
+        .tab-panel {
+            display: none
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn .3s ease
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-align: center
+        }
+
+        .toggle-link {
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 12px;
+            display: block
+        }
+
+        .toggle-link:hover {
+            text-decoration: underline
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <div class="logo-icon">🎓</div>
+                <h1>JNTU-GV Placement cell</h1>
+                <p>University Placement Support System</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="admin" onclick="switchTab('admin')"><span
+                        class="tab-icon">🛡️</span>Admin</button>
+                <button class="tab" data-tab="student" onclick="switchTab('student')"><span
+                        class="tab-icon">🎓</span>Student</button>
+                <button class="tab" data-tab="company" onclick="switchTab('company')"><span
+                        class="tab-icon">🏢</span>Company</button>
+            </div>
+
+            <div class="error-msg" id="errorMsg"></div>
+            <div class="success-msg" id="successMsg"></div>
+
+            <!-- ═══ Admin Login ═══ -->
+            <div class="tab-panel active" id="panel-admin">
+                <form id="adminForm">
+                    <div class="form-group">
+                        <label>Admin Username</label>
+                        <input type="text" id="admin-user" placeholder="Enter admin username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="admin-pass" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn-login btn-admin">Sign In as Admin</button>
+                </form>
+            </div>
+
+            <!-- ═══ Student Login ═══ -->
+            <div class="tab-panel" id="panel-student">
+                <form id="studentForm">
+                    <div class="form-group">
+                        <label>Student ID</label>
+                        <input type="text" id="student-user" placeholder="e.g. S001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="student-pass" placeholder="Enter your Student ID as password"
+                            required>
+                    </div>
+                    <button type="submit" class="btn-login btn-student">Sign In as Student</button>
+                </form>
+                <p class="hint">Your Student ID is both your username and password (e.g. S001)</p>
+            </div>
+
+            <!-- ═══ Company Login / Register ═══ -->
+            <div class="tab-panel" id="panel-company">
+                <!-- Login form -->
+                <div id="company-login-section">
+                    <form id="companyLoginForm">
+                        <div class="form-group">
+                            <label>Company Name (Username)</label>
+                            <input type="text" id="company-login-user" placeholder="Enter company name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="company-login-pass" placeholder="Enter password" required>
+                        </div>
+                        <button type="submit" class="btn-login btn-company">Sign In as Company</button>
+                    </form>
+                    <span class="toggle-link" onclick="toggleCompanyMode('register')">Don't have an account? Register
+                        here →</span>
+                </div>
+
+                <!-- Register form -->
+                <div id="company-register-section" style="display:none;">
+                    <form id="companyRegisterForm">
+                        <div class="form-group">
+                            <label>Verified Company ID</label>
+                            <input type="text" id="reg-company-id" placeholder="e.g. CMP001" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Company Name (Username)</label>
+                            <input type="text" id="reg-company-name" placeholder="Your company name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="reg-company-pass" placeholder="Create a password" required>
+                        </div>
+                        <button type="submit" class="btn-login btn-company">Register Company</button>
+                    </form>
+                    <span class="toggle-link" onclick="toggleCompanyMode('login')">← Already registered? Sign in</span>
+                    <p class="hint" style="margin-top:8px">You need a verified Company ID from the placement office
+                        (CMP001–CMP020)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`panel-${tab}`).classList.add('active');
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+        }
+
+        function toggleCompanyMode(mode) {
+            document.getElementById('company-login-section').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('company-register-section').style.display = mode === 'register' ? 'block' : 'none';
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg; errorMsg.style.display = 'block';
+            successMsg.style.display = 'none';
+        }
+        function showSuccess(msg) {
+            successMsg.textContent = msg; successMsg.style.display = 'block';
+            errorMsg.style.display = 'none';
+        }
+
+        async function doLogin(username, password) {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Login failed');
+            localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('user_role', data.role);
+            localStorage.setItem('username', data.username);
+            window.location.href = '/dashboard';
+        }
+
+        // Admin login
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try { await doLogin(document.getElementById('admin-user').value.trim(), document.getElementById('admin-pass').value); }
+            catch (err) { showError(err.message); }
+        });
+
+        // Student login
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try { await doLogin(document.getElementById('student-user').value.trim(), document.getElementById('student-pass').value); }
+            catch (err) { showError(err.message); }
+        });
+
+        // Company login
+        document.getElementById('companyLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try { await doLogin(document.getElementById('company-login-user').value.trim(), document.getElementById('company-login-pass').value); }
+            catch (err) { showError(err.message); }
+        });
+
+        // Company register
+        document.getElementById('companyRegisterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch('/api/auth/register/company', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        company_id: document.getElementById('reg-company-id').value.trim(),
+                        company_name: document.getElementById('reg-company-name').value.trim(),
+                        password: document.getElementById('reg-company-pass').value,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Registration failed');
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('user_role', data.role);
+                localStorage.setItem('username', data.username);
+                window.location.href = '/dashboard';
+            } catch (err) { showError(err.message); }
+        });
+
+        // Redirect if already logged in
+        if (localStorage.getItem('access_token')) { window.location.href = '/dashboard'; }
+    </script>
+</body>
+
+</html>
